@@ -81,7 +81,6 @@ public class PreferencesHelper {
                 Category.of(bundle.getString("preferences.category.settings"),
                         Group.of(bundle.getString("preferences.group.authentication"),
                                 Setting.of(bundle.getString("preferences.accessToken"), accessToken)
-                                        .customKey("accessToken")
                         ),
                         Group.of(bundle.getString("preferences.group.api"),
                                 Setting.of(bundle.getString("preferences.figmaApiUrl"), figmaApiUrl)
