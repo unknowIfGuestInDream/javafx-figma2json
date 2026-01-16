@@ -6,7 +6,7 @@
 
     <groupId>com.tlcsdm</groupId>
     <artifactId>figma2json</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>Figma to JSON Exporter</name>
     <description>A JavaFX application to export Figma design resources to JSON and generate project code</description>
@@ -20,9 +20,9 @@
         <mainClass>com.tlcsdm.figma2json.Main</mainClass>
         
         <!-- Dependency versions -->
-        <javafx.version>21.0.5</javafx.version>
-        <controlsfx.version>11.2.1</controlsfx.version>
-        <gson.version>2.11.0</gson.version>
+        <javafx.version>21.0.9</javafx.version>
+        <controlsfx.version>11.2.3</controlsfx.version>
+        <gson.version>2.13.2</gson.version>
     </properties>
 
     <dependencyManagement>

@@ -25,7 +25,7 @@ mvn clean package
 ## Run
 
 ```bash
-java -jar target/figma2json-1.0.0-SNAPSHOT.jar
+java -jar target/figma2json-1.0.0.jar
 ```
 
 Or using Maven:
@@ -66,21 +66,6 @@ src/main/java/com/tlcsdm/figma2json/
 ├── util/         # Utility classes
 └── Main.java     # Application entry point
 ```
-
-## Dependencies
-
-- JavaFX 21
-- ControlsFX 11.2.1
-- Gson 2.11.0
-
-## Internationalization
-
-The application supports three languages:
-- English (default)
-- Chinese (中文)
-- Japanese (日本語)
-
-Language can be changed in the Settings section. A restart is required for the change to take effect.
 
 ## Getting a Figma Access Token
 
