@@ -115,8 +115,7 @@ public class Figma2JsonApp extends Application {
         VBox content = new VBox(10);
         content.getChildren().addAll(
             new Label(bundle.getString("about.version")),
-            new Label(bundle.getString("about.description")),
-            new Label(bundle.getString("about.author"))
+            new Label(bundle.getString("about.description"))
         );
         alert.getDialogPane().setContent(content);
         
