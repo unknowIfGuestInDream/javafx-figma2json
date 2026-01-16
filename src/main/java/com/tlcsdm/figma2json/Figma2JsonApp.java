@@ -56,7 +56,8 @@ public class Figma2JsonApp extends Application {
         rootPane.setTop(menuBar);
         rootPane.setCenter(mainContent);
 
-        // Calculate window size based on screen dimensions (70% of screen size)
+        // Calculate window size based on screen dimensions
+        // Use 70% width and 75% height to maintain a comfortable aspect ratio for the UI
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double width = Math.min(screenBounds.getWidth() * 0.7, 1200);
         double height = Math.min(screenBounds.getHeight() * 0.75, 900);
