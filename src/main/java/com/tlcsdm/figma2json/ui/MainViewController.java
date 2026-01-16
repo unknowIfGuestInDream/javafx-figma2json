@@ -286,7 +286,12 @@ public class MainViewController implements Initializable {
         }
 
         Node node = selected.getValue();
-        String format = formatComboBox.getValue().toLowerCase();
+        String formatValue = formatComboBox.getValue();
+        if (formatValue == null || formatValue.isBlank()) {
+            showError(bundle.getString("error.noConverter") + ": " + formatValue);
+            return;
+        }
+        String format = formatValue.toLowerCase();
         FigmaConverter converter = ConverterFactory.getConverter(format);
 
         if (converter == null) {
@@ -296,7 +301,8 @@ public class MainViewController implements Initializable {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle(bundle.getString("dialog.saveAs"));
-        fileChooser.setInitialFileName(node.getName() + "." + converter.getFileExtension());
+        String nodeName = node.getName() != null ? node.getName() : node.getId();
+        fileChooser.setInitialFileName(nodeName + "." + converter.getFileExtension());
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter(format.toUpperCase() + " files",
                         "*." + converter.getFileExtension()));
@@ -338,7 +344,12 @@ public class MainViewController implements Initializable {
         }
 
         Node node = selected.getValue();
-        String generatorName = generatorComboBox.getValue().toLowerCase();
+        String generatorValue = generatorComboBox.getValue();
+        if (generatorValue == null || generatorValue.isBlank()) {
+            showError(bundle.getString("error.noGenerator") + ": " + generatorValue);
+            return;
+        }
+        String generatorName = generatorValue.toLowerCase();
         ProjectGenerator generator = GeneratorFactory.getGenerator(generatorName);
 
         if (generator == null) {
@@ -357,9 +368,10 @@ public class MainViewController implements Initializable {
         setLoading(true);
         log(bundle.getString("log.generating") + ": " + generator.getName());
 
+        String projectName = node.getName() != null ? node.getName() : node.getId();
         CompletableFuture.runAsync(() -> {
             try {
-                Path projectPath = Path.of(outputPath, node.getName() + "_project");
+                Path projectPath = Path.of(outputPath, projectName + "_project");
                 generator.generate(jsonData, projectPath);
                 Platform.runLater(() -> {
                     setLoading(false);
