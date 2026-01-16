@@ -6,12 +6,14 @@ import com.tlcsdm.figma2json.util.SettingsManager;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.util.Locale;
@@ -54,7 +56,13 @@ public class Figma2JsonApp extends Application {
         rootPane.setTop(menuBar);
         rootPane.setCenter(mainContent);
 
-        Scene scene = new Scene(rootPane, 900, 750);
+        // Calculate window size based on screen dimensions
+        // Use 70% width and 75% height to maintain a comfortable aspect ratio for the UI
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        double width = Math.min(screenBounds.getWidth() * 0.7, 1200);
+        double height = Math.min(screenBounds.getHeight() * 0.75, 900);
+        
+        Scene scene = new Scene(rootPane, width, height);
         primaryStage.setTitle(bundle.getString("app.title"));
         primaryStage.setScene(scene);
         

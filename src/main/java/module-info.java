@@ -8,6 +8,7 @@ module com.tlcsdm.figma2json {
 
     opens com.tlcsdm.figma2json to javafx.fxml;
     opens com.tlcsdm.figma2json.ui to javafx.fxml;
+    opens com.tlcsdm.figma2json.api to com.google.gson;
 
     exports com.tlcsdm.figma2json;
 }
