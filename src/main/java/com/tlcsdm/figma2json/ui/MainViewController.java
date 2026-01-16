@@ -394,7 +394,18 @@ public class MainViewController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(bundle.getString("dialog.error"));
         alert.setHeaderText(null);
-        alert.setContentText(message);
+        
+        // Use a TextArea for the content to make it copyable
+        TextArea textArea = new TextArea(message);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        textArea.setPrefRowCount(4);
+        textArea.setStyle("-fx-font-family: monospace;");
+        
+        alert.getDialogPane().setContent(textArea);
+        alert.getDialogPane().setMinWidth(450);
         alert.showAndWait();
     }
 
