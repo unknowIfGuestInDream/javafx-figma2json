@@ -78,18 +78,22 @@ public class PreferencesHelper {
 
     private PreferencesFx createPreferencesFx() {
         return PreferencesFx.of(PreferencesHelper.class,
-                Category.of(bundle.getString("preferences.category.general"),
+                Category.of(bundle.getString("preferences.category.settings"),
                         Group.of(bundle.getString("preferences.group.authentication"),
                                 Setting.of(bundle.getString("preferences.accessToken"), accessToken)
-                        ),
-                        Group.of(bundle.getString("preferences.group.language"),
-                                Setting.of(bundle.getString("preferences.language"), languageOptions, language)
+                                        .customKey("accessToken")
                         ),
                         Group.of(bundle.getString("preferences.group.api"),
                                 Setting.of(bundle.getString("preferences.figmaApiUrl"), figmaApiUrl)
                         )
+                ),
+                Category.of(bundle.getString("preferences.category.system"),
+                        Group.of(bundle.getString("preferences.group.language"),
+                                Setting.of(bundle.getString("preferences.language"), languageOptions, language)
+                        )
                 )
-        ).persistWindowState(false).saveSettings(true).debugHistoryMode(false).instantPersistent(true);
+        ).persistWindowState(false).saveSettings(true).debugHistoryMode(false).instantPersistent(false)
+                .buttonsVisibility(true);
     }
 
     /**
