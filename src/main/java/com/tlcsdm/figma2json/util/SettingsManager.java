@@ -14,6 +14,8 @@ public class SettingsManager {
     private static final String PREF_GENERATOR = "generator";
     private static final String PREF_OUTPUT_PATH = "outputPath";
     private static final String PREF_LAST_FIGMA_URL = "lastFigmaUrl";
+    private static final String PREF_FIGMA_API_URL = "figmaApiUrl";
+    private static final String DEFAULT_FIGMA_API_URL = "https://api.figma.com/v1";
 
     private final Preferences prefs;
 
@@ -140,6 +142,33 @@ public class SettingsManager {
      */
     public void setLastFigmaUrl(String url) {
         prefs.put(PREF_LAST_FIGMA_URL, url != null ? url : "");
+    }
+
+    /**
+     * Gets the Figma API URL.
+     *
+     * @return the Figma API URL, or default if not set
+     */
+    public String getFigmaApiUrl() {
+        return prefs.get(PREF_FIGMA_API_URL, DEFAULT_FIGMA_API_URL);
+    }
+
+    /**
+     * Sets the Figma API URL.
+     *
+     * @param url the Figma API URL
+     */
+    public void setFigmaApiUrl(String url) {
+        prefs.put(PREF_FIGMA_API_URL, url != null && !url.isBlank() ? url : DEFAULT_FIGMA_API_URL);
+    }
+
+    /**
+     * Gets the default Figma API URL.
+     *
+     * @return the default Figma API URL
+     */
+    public static String getDefaultFigmaApiUrl() {
+        return DEFAULT_FIGMA_API_URL;
     }
 
     /**
