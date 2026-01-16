@@ -1,6 +1,5 @@
 package com.tlcsdm.figma2json.ui;
 
-import com.tlcsdm.figma2json.Figma2JsonApp;
 import com.tlcsdm.figma2json.api.Document;
 import com.tlcsdm.figma2json.api.FigmaApiClient;
 import com.tlcsdm.figma2json.api.FigmaFile;
@@ -33,9 +32,6 @@ import java.util.concurrent.CompletableFuture;
 public class MainViewController implements Initializable {
 
     @FXML
-    private PasswordField accessTokenField;
-
-    @FXML
     private TextField figmaUrlField;
 
     @FXML
@@ -52,9 +48,6 @@ public class MainViewController implements Initializable {
 
     @FXML
     private ComboBox<String> generatorComboBox;
-
-    @FXML
-    private ComboBox<String> languageComboBox;
 
     @FXML
     private TextField outputPathField;
@@ -81,6 +74,7 @@ public class MainViewController implements Initializable {
     private final FigmaApiClient figmaClient = new FigmaApiClient();
     private FigmaFile currentFile;
     private ResourceBundle bundle;
+    private PreferencesHelper preferencesHelper;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -105,8 +99,16 @@ public class MainViewController implements Initializable {
         log(bundle.getString("log.ready"));
     }
 
+    /**
+     * Sets the preferences helper.
+     *
+     * @param preferencesHelper the preferences helper
+     */
+    public void setPreferencesHelper(PreferencesHelper preferencesHelper) {
+        this.preferencesHelper = preferencesHelper;
+    }
+
     private void loadSettings() {
-        accessTokenField.setText(settingsManager.getAccessToken());
         figmaUrlField.setText(settingsManager.getLastFigmaUrl());
         outputPathField.setText(settingsManager.getOutputPath());
     }
@@ -123,28 +125,6 @@ public class MainViewController implements Initializable {
         generatorComboBox.setItems(FXCollections.observableArrayList(generators.stream()
                 .map(this::capitalize).toList()));
         generatorComboBox.setValue(capitalize(settingsManager.getGenerator().toLowerCase()));
-
-        // Language combo box
-        languageComboBox.setItems(FXCollections.observableArrayList("English", "中文", "日本語"));
-        String currentLang = settingsManager.getLanguage();
-        languageComboBox.setValue(switch (currentLang) {
-            case "zh" -> "中文";
-            case "ja" -> "日本語";
-            default -> "English";
-        });
-
-        languageComboBox.setOnAction(e -> {
-            String selected = languageComboBox.getValue();
-            String langCode = switch (selected) {
-                case "中文" -> "zh";
-                case "日本語" -> "ja";
-                default -> "en";
-            };
-            settingsManager.setLanguage(langCode);
-            Locale locale = settingsManager.getLocale();
-            Figma2JsonApp.setLocale(locale);
-            showRestartNotification();
-        });
     }
 
     private String capitalize(String str) {
@@ -175,21 +155,26 @@ public class MainViewController implements Initializable {
         generateProjectButton.setOnAction(e -> generateProject());
 
         // Save settings when fields change
-        accessTokenField.textProperty().addListener((obs, oldVal, newVal) ->
-                settingsManager.setAccessToken(newVal));
         figmaUrlField.textProperty().addListener((obs, oldVal, newVal) ->
                 settingsManager.setLastFigmaUrl(newVal));
         outputPathField.textProperty().addListener((obs, oldVal, newVal) ->
                 settingsManager.setOutputPath(newVal));
-        formatComboBox.valueProperty().addListener((obs, oldVal, newVal) ->
-                settingsManager.setOutputFormat(newVal.toLowerCase()));
-        generatorComboBox.valueProperty().addListener((obs, oldVal, newVal) ->
-                settingsManager.setGenerator(newVal));
+        formatComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setOutputFormat(newVal.toLowerCase());
+            }
+        });
+        generatorComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setGenerator(newVal);
+            }
+        });
     }
 
     @FXML
     private void loadFigmaFile() {
-        String token = accessTokenField.getText();
+        // Get access token from preferences
+        String token = preferencesHelper != null ? preferencesHelper.getAccessToken() : settingsManager.getAccessToken();
         String url = figmaUrlField.getText();
 
         if (token == null || token.isBlank()) {
@@ -206,7 +191,11 @@ public class MainViewController implements Initializable {
         setLoading(true);
         log(bundle.getString("log.loading") + ": " + fileKey);
 
+        // Configure the API client with token and API URL
         figmaClient.setAccessToken(token);
+        String apiUrl = preferencesHelper != null ? preferencesHelper.getFigmaApiUrl() : settingsManager.getFigmaApiUrl();
+        figmaClient.setBaseUrl(apiUrl);
+        
         CompletableFuture<FigmaFile> future = figmaClient.getFile(fileKey);
 
         future.thenAccept(file -> Platform.runLater(() -> {
@@ -414,13 +403,5 @@ public class MainViewController implements Initializable {
                 .title(bundle.getString("dialog.success"))
                 .text(message)
                 .showInformation();
-    }
-
-    private void showRestartNotification() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(bundle.getString("dialog.languageChanged"));
-        alert.setHeaderText(null);
-        alert.setContentText(bundle.getString("dialog.restartRequired"));
-        alert.showAndWait();
     }
 }

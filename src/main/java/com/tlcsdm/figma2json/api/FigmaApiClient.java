@@ -16,11 +16,12 @@ import java.util.concurrent.CompletableFuture;
  */
 public class FigmaApiClient {
 
-    private static final String BASE_URL = "https://api.figma.com/v1";
+    private static final String DEFAULT_BASE_URL = "https://api.figma.com/v1";
 
     private final HttpClient httpClient;
     private final Gson gson;
     private String accessToken;
+    private String baseUrl = DEFAULT_BASE_URL;
 
     public FigmaApiClient() {
         this.httpClient = HttpClient.newBuilder()
@@ -41,13 +42,22 @@ public class FigmaApiClient {
     }
 
     /**
+     * Sets the base URL for the Figma API.
+     *
+     * @param baseUrl the base URL
+     */
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl != null && !baseUrl.isBlank() ? baseUrl : DEFAULT_BASE_URL;
+    }
+
+    /**
      * Gets a Figma file by its key.
      *
      * @param fileKey the file key extracted from the Figma URL
      * @return CompletableFuture containing the FigmaFile
      */
     public CompletableFuture<FigmaFile> getFile(String fileKey) {
-        String url = BASE_URL + "/files/" + fileKey;
+        String url = baseUrl + "/files/" + fileKey;
         HttpRequest request = buildRequest(url);
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -68,7 +78,7 @@ public class FigmaApiClient {
      * @return CompletableFuture containing the node data as JSON string
      */
     public CompletableFuture<String> getNode(String fileKey, String nodeId) {
-        String url = BASE_URL + "/files/" + fileKey + "/nodes?ids=" + nodeId;
+        String url = baseUrl + "/files/" + fileKey + "/nodes?ids=" + nodeId;
         HttpRequest request = buildRequest(url);
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -90,7 +100,7 @@ public class FigmaApiClient {
      * @throws InterruptedException if the operation is interrupted
      */
     public FigmaFile getFileSync(String fileKey) throws IOException, InterruptedException {
-        String url = BASE_URL + "/files/" + fileKey;
+        String url = baseUrl + "/files/" + fileKey;
         HttpRequest request = buildRequest(url);
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());

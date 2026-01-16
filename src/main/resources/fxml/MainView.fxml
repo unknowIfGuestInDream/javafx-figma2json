@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.controlsfx.control.StatusBar?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -22,21 +21,14 @@
                         <Insets top="10" right="10" bottom="10" left="10"/>
                     </padding>
 
-                    <Label text="%settings.accessToken" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                    <PasswordField fx:id="accessTokenField" promptText="%settings.accessToken.prompt"
-                                   GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS"/>
+                    <Label text="%settings.outputFormat" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="formatComboBox" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
 
-                    <Label text="%settings.language" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                    <ComboBox fx:id="languageComboBox" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                    <Label text="%settings.generator" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="generatorComboBox" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
 
-                    <Label text="%settings.outputFormat" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                    <ComboBox fx:id="formatComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                    <Label text="%settings.generator" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
-                    <ComboBox fx:id="generatorComboBox" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
-
-                    <Label text="%settings.outputPath" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                    <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3">
+                    <Label text="%settings.outputPath" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="3">
                         <TextField fx:id="outputPathField" promptText="%settings.outputPath.prompt" HBox.hgrow="ALWAYS"/>
                         <Button fx:id="browseButton" text="%button.browse"/>
                     </HBox>
