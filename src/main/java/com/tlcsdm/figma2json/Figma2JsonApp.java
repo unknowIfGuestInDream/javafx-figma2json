@@ -140,12 +140,25 @@ public class Figma2JsonApp extends Application {
     }
 
     private void restartApplication() {
+        // Close current stage and reload with new locale
         primaryStage.close();
+        
+        // Reset preferences helper for new instance
+        preferencesHelper = null;
+        
         Platform.runLater(() -> {
             try {
-                new Figma2JsonApp().start(new Stage());
+                // Reload locale from preferences (which may have changed)
+                settingsManager = new SettingsManager();
+                initialLanguage = settingsManager.getLanguage();
+                
+                // Create new stage and start fresh
+                Stage newStage = new Stage();
+                start(newStage);
             } catch (Exception e) {
                 e.printStackTrace();
+                // If restart fails, exit the application
+                Platform.exit();
             }
         });
     }

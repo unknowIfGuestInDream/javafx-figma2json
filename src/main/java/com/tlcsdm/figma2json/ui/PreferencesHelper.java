@@ -45,16 +45,22 @@ public class PreferencesHelper {
 
     private void setupPropertyListeners() {
         accessToken.addListener((obs, oldVal, newVal) -> {
-            settingsManager.setAccessToken(newVal);
+            if (newVal != null) {
+                settingsManager.setAccessToken(newVal);
+            }
         });
 
         language.addListener((obs, oldVal, newVal) -> {
-            String langCode = getLanguageCode(newVal);
-            settingsManager.setLanguage(langCode);
+            if (newVal != null) {
+                String langCode = getLanguageCode(newVal);
+                settingsManager.setLanguage(langCode);
+            }
         });
 
         figmaApiUrl.addListener((obs, oldVal, newVal) -> {
-            settingsManager.setFigmaApiUrl(newVal);
+            if (newVal != null) {
+                settingsManager.setFigmaApiUrl(newVal);
+            }
         });
     }
 
