@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.StatusBar?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tlcsdm.figma2json.ui.MainViewController">
+
+    <top>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <!-- Settings Section -->
+            <TitledPane text="%settings.title" expanded="true">
+                <GridPane hgap="10" vgap="10">
+                    <padding>
+                        <Insets top="10" right="10" bottom="10" left="10"/>
+                    </padding>
+
+                    <Label text="%settings.accessToken" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                    <PasswordField fx:id="accessTokenField" promptText="%settings.accessToken.prompt"
+                                   GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.hgrow="ALWAYS"/>
+
+                    <Label text="%settings.language" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                    <ComboBox fx:id="languageComboBox" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+
+                    <Label text="%settings.outputFormat" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="formatComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="%settings.generator" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="generatorComboBox" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+
+                    <Label text="%settings.outputPath" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <HBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.columnSpan="3">
+                        <TextField fx:id="outputPathField" promptText="%settings.outputPath.prompt" HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="browseButton" text="%button.browse"/>
+                    </HBox>
+
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="120"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints minWidth="80"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                    </columnConstraints>
+                </GridPane>
+            </TitledPane>
+
+            <!-- Figma URL Input -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="%figma.url"/>
+                <TextField fx:id="figmaUrlField" promptText="%figma.url.prompt" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="loadButton" text="%button.load"/>
+                <ProgressIndicator fx:id="progressIndicator" visible="false" prefWidth="25" prefHeight="25"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <SplitPane dividerPositions="0.3, 0.6">
+            <!-- Pages Tree -->
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
+                </padding>
+                <Label text="%tree.pages" style="-fx-font-weight: bold;"/>
+                <TreeView fx:id="pagesTreeView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Layers Tree -->
+            <VBox spacing="5">
+                <padding>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
+                </padding>
+                <Label text="%tree.layers" style="-fx-font-weight: bold;"/>
+                <TreeView fx:id="layersTreeView" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Action Panel -->
+            <VBox spacing="10">
+                <padding>
+                    <Insets top="5" right="5" bottom="5" left="5"/>
+                </padding>
+                <Label text="%action.title" style="-fx-font-weight: bold;"/>
+                <Button fx:id="exportJsonButton" text="%button.exportJson" maxWidth="Infinity"/>
+                <Button fx:id="generateProjectButton" text="%button.generateProject" maxWidth="Infinity"/>
+                <Separator/>
+                <Label text="%log.title" style="-fx-font-weight: bold;"/>
+                <TextArea fx:id="logArea" editable="false" VBox.vgrow="ALWAYS" wrapText="true"/>
+            </VBox>
+        </SplitPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <padding>
+                <Insets top="5" right="10" bottom="5" left="10"/>
+            </padding>
+            <Label fx:id="statusLabel" text="%status.ready"/>
+        </HBox>
+    </bottom>
+</BorderPane>
