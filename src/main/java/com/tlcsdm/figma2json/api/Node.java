@@ -18,11 +18,11 @@ public class Node {
     @SerializedName("absoluteBoundingBox")
     private BoundingBox absoluteBoundingBox;
 
-    private Map<String, Object> fills;
-    private Map<String, Object> strokes;
+    private List<Object> fills;
+    private List<Object> strokes;
     private Double strokeWeight;
     private Double cornerRadius;
-    private Map<String, Object> effects;
+    private List<Object> effects;
     private String blendMode;
     private Double opacity;
     private Map<String, Object> constraints;
@@ -75,19 +75,19 @@ public class Node {
         this.absoluteBoundingBox = absoluteBoundingBox;
     }
 
-    public Map<String, Object> getFills() {
+    public List<Object> getFills() {
         return fills;
     }
 
-    public void setFills(Map<String, Object> fills) {
+    public void setFills(List<Object> fills) {
         this.fills = fills;
     }
 
-    public Map<String, Object> getStrokes() {
+    public List<Object> getStrokes() {
         return strokes;
     }
 
-    public void setStrokes(Map<String, Object> strokes) {
+    public void setStrokes(List<Object> strokes) {
         this.strokes = strokes;
     }
 
@@ -107,11 +107,11 @@ public class Node {
         this.cornerRadius = cornerRadius;
     }
 
-    public Map<String, Object> getEffects() {
+    public List<Object> getEffects() {
         return effects;
     }
 
-    public void setEffects(Map<String, Object> effects) {
+    public void setEffects(List<Object> effects) {
         this.effects = effects;
     }
 
