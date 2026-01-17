@@ -135,6 +135,48 @@ class FigmaApiClientTest {
         assertEquals("Button/Secondary", component2.getName());
     }
 
+    @Test
+    @DisplayName("FigmaFile should correctly parse JSON with documentationLinks as an array")
+    void parseJson_documentationLinksAsArray_parsesCorrectly() {
+        String json = """
+            {
+              "name": "Test File",
+              "lastModified": "2024-01-01T12:00:00.000Z",
+              "version": "123456789",
+              "components": {
+                "123:456": {
+                  "key": "component_key_1",
+                  "name": "Button/Primary",
+                  "description": "A primary button",
+                  "documentationLinks": [
+                    {"url": "https://example.com/docs/button"},
+                    {"url": "https://example.com/docs/primary-button"}
+                  ]
+                }
+              }
+            }
+            """;
+
+        Gson gson = new GsonBuilder().create();
+        FigmaFile file = gson.fromJson(json, FigmaFile.class);
+
+        assertNotNull(file);
+        assertEquals("Test File", file.getName());
+        assertNotNull(file.getComponents());
+        assertEquals(1, file.getComponents().size());
+        
+        // Verify component with node ID "123:456"
+        Component component = file.getComponents().get("123:456");
+        assertNotNull(component);
+        assertEquals("component_key_1", component.getKey());
+        assertEquals("Button/Primary", component.getName());
+        assertEquals("A primary button", component.getDescription());
+        
+        // Verify documentationLinks is parsed as a list
+        assertNotNull(component.getDocumentationLinks());
+        assertEquals(2, component.getDocumentationLinks().size());
+    }
+
     /**
      * Integration test for actual API calls.
      * This test is disabled by default as it requires a valid access token.

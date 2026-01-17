@@ -1,5 +1,7 @@
 package com.tlcsdm.figma2json.api;
 
+import java.util.List;
+
 /**
  * Represents a Figma component.
  */
@@ -8,7 +10,7 @@ public class Component {
     private String name;
     private String description;
     private String componentSetId;
-    private String documentationLinks;
+    private List<Object> documentationLinks;
 
     public String getKey() {
         return key;
@@ -42,11 +44,11 @@ public class Component {
         this.componentSetId = componentSetId;
     }
 
-    public String getDocumentationLinks() {
+    public List<Object> getDocumentationLinks() {
         return documentationLinks;
     }
 
-    public void setDocumentationLinks(String documentationLinks) {
+    public void setDocumentationLinks(List<Object> documentationLinks) {
         this.documentationLinks = documentationLinks;
     }
 }
