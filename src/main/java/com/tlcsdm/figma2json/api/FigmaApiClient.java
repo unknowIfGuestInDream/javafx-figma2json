@@ -2,6 +2,8 @@ package com.tlcsdm.figma2json.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class FigmaApiClient {
 
+    private static final Logger logger = LoggerFactory.getLogger(FigmaApiClient.class);
     private static final String DEFAULT_BASE_URL = "https://api.figma.com/v1";
 
     private final HttpClient httpClient;
@@ -58,10 +61,13 @@ public class FigmaApiClient {
      */
     public CompletableFuture<FigmaFile> getFile(String fileKey) {
         String url = baseUrl + "/files/" + fileKey;
+        logger.debug("Requesting Figma file: {}", url);
         HttpRequest request = buildRequest(url);
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
+                    logger.debug("Response status: {}", response.statusCode());
+                    logger.debug("Response body: {}", response.body());
                     if (response.statusCode() != 200) {
                         throw new RuntimeException("API request failed with status: " + response.statusCode() + 
                                 ", body: " + response.body());
@@ -79,10 +85,13 @@ public class FigmaApiClient {
      */
     public CompletableFuture<String> getNode(String fileKey, String nodeId) {
         String url = baseUrl + "/files/" + fileKey + "/nodes?ids=" + nodeId;
+        logger.debug("Requesting Figma node: {}", url);
         HttpRequest request = buildRequest(url);
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
+                    logger.debug("Response status: {}", response.statusCode());
+                    logger.debug("Response body: {}", response.body());
                     if (response.statusCode() != 200) {
                         throw new RuntimeException("API request failed with status: " + response.statusCode() +
                                 ", body: " + response.body());
@@ -101,9 +110,12 @@ public class FigmaApiClient {
      */
     public FigmaFile getFileSync(String fileKey) throws IOException, InterruptedException {
         String url = baseUrl + "/files/" + fileKey;
+        logger.debug("Requesting Figma file (sync): {}", url);
         HttpRequest request = buildRequest(url);
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        logger.debug("Response status: {}", response.statusCode());
+        logger.debug("Response body: {}", response.body());
         if (response.statusCode() != 200) {
             throw new RuntimeException("API request failed with status: " + response.statusCode() +
                     ", body: " + response.body());

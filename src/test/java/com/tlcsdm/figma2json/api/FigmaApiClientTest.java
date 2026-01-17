@@ -1,5 +1,7 @@
 package com.tlcsdm.figma2json.api;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -86,6 +88,51 @@ class FigmaApiClientTest {
     @DisplayName("getGson should return non-null Gson instance")
     void getGson_returnsNonNullInstance() {
         assertNotNull(apiClient.getGson());
+    }
+
+    @Test
+    @DisplayName("FigmaFile should correctly parse JSON with components as a Map")
+    void parseJson_componentsAsMap_parsesCorrectly() {
+        String json = """
+            {
+              "name": "Test File",
+              "lastModified": "2024-01-01T12:00:00.000Z",
+              "version": "123456789",
+              "components": {
+                "123:456": {
+                  "key": "component_key_1",
+                  "name": "Button/Primary",
+                  "description": "A primary button"
+                },
+                "789:012": {
+                  "key": "component_key_2",
+                  "name": "Button/Secondary",
+                  "description": "A secondary button"
+                }
+              }
+            }
+            """;
+
+        Gson gson = new GsonBuilder().create();
+        FigmaFile file = gson.fromJson(json, FigmaFile.class);
+
+        assertNotNull(file);
+        assertEquals("Test File", file.getName());
+        assertNotNull(file.getComponents());
+        assertEquals(2, file.getComponents().size());
+        
+        // Verify component with node ID "123:456"
+        Component component1 = file.getComponents().get("123:456");
+        assertNotNull(component1);
+        assertEquals("component_key_1", component1.getKey());
+        assertEquals("Button/Primary", component1.getName());
+        assertEquals("A primary button", component1.getDescription());
+        
+        // Verify component with node ID "789:012"
+        Component component2 = file.getComponents().get("789:012");
+        assertNotNull(component2);
+        assertEquals("component_key_2", component2.getKey());
+        assertEquals("Button/Secondary", component2.getName());
     }
 
     /**
