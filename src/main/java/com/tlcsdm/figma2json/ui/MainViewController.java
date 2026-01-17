@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -119,12 +120,26 @@ public class MainViewController implements Initializable {
         formatComboBox.setItems(FXCollections.observableArrayList(formats.stream()
                 .map(String::toUpperCase).toList()));
         formatComboBox.setValue(settingsManager.getOutputFormat().toUpperCase());
+        
+        // Set initial export button text and add listener for format changes
+        updateExportButtonText(formatComboBox.getValue());
+        formatComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                updateExportButtonText(newVal);
+            }
+        });
 
         // Generator combo box
         List<String> generators = new ArrayList<>(GeneratorFactory.getAvailableGenerators());
         generatorComboBox.setItems(FXCollections.observableArrayList(generators.stream()
                 .map(this::capitalize).toList()));
         generatorComboBox.setValue(capitalize(settingsManager.getGenerator().toLowerCase()));
+    }
+    
+    private void updateExportButtonText(String format) {
+        String pattern = bundle.getString("button.export");
+        String buttonText = MessageFormat.format(pattern, format != null ? format : "");
+        exportJsonButton.setText(buttonText);
     }
 
     private String capitalize(String str) {
@@ -380,8 +395,17 @@ public class MainViewController implements Initializable {
     private void setLoading(boolean loading) {
         progressIndicator.setVisible(loading);
         loadButton.setDisable(loading);
-        exportJsonButton.setDisable(loading);
-        generateProjectButton.setDisable(loading);
+        
+        // When loading ends, only enable export/generate buttons if a layer is selected
+        if (loading) {
+            exportJsonButton.setDisable(true);
+            generateProjectButton.setDisable(true);
+        } else {
+            boolean hasLayerSelection = layersTreeView.getSelectionModel().getSelectedItem() != null 
+                    && layersTreeView.getSelectionModel().getSelectedItem().getValue() != null;
+            exportJsonButton.setDisable(!hasLayerSelection);
+            generateProjectButton.setDisable(!hasLayerSelection);
+        }
     }
 
     private void log(String message) {

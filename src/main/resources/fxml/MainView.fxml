@@ -78,7 +78,7 @@
                     <Insets top="5" right="5" bottom="5" left="5"/>
                 </padding>
                 <Label text="%action.title" style="-fx-font-weight: bold;"/>
-                <Button fx:id="exportJsonButton" text="%button.exportJson" maxWidth="Infinity"/>
+                <Button fx:id="exportJsonButton" maxWidth="Infinity"/>
                 <Button fx:id="generateProjectButton" text="%button.generateProject" maxWidth="Infinity"/>
                 <Separator/>
                 <Label text="%log.title" style="-fx-font-weight: bold;"/>
