@@ -401,11 +401,13 @@ public class MainViewController implements Initializable {
         textArea.setWrapText(true);
         textArea.setMaxWidth(Double.MAX_VALUE);
         textArea.setMaxHeight(Double.MAX_VALUE);
-        textArea.setPrefRowCount(4);
+        textArea.setPrefRowCount(10);
         textArea.setStyle("-fx-font-family: monospace;");
         
         alert.getDialogPane().setContent(textArea);
-        alert.getDialogPane().setMinWidth(450);
+        alert.getDialogPane().setMinWidth(500);
+        alert.getDialogPane().setMinHeight(300);
+        alert.setResizable(true);
         alert.showAndWait();
     }
 
