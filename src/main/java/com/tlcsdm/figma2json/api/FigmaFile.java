@@ -1,6 +1,6 @@
 package com.tlcsdm.figma2json.api;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Figma file response.
@@ -12,7 +12,7 @@ public class FigmaFile {
     private String version;
     private String role;
     private Document document;
-    private List<Component> components;
+    private Map<String, Component> components;
 
     public String getName() {
         return name;
@@ -62,11 +62,11 @@ public class FigmaFile {
         this.document = document;
     }
 
-    public List<Component> getComponents() {
+    public Map<String, Component> getComponents() {
         return components;
     }
 
-    public void setComponents(List<Component> components) {
+    public void setComponents(Map<String, Component> components) {
         this.components = components;
     }
 }
