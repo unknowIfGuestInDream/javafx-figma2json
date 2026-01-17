@@ -138,7 +138,7 @@ public class MainViewController implements Initializable {
     
     private void updateExportButtonText(String format) {
         String pattern = bundle.getString("button.export");
-        String buttonText = MessageFormat.format(pattern, format != null ? format : "");
+        String buttonText = MessageFormat.format(pattern, format != null ? format : "JSON");
         exportJsonButton.setText(buttonText);
     }
 
@@ -401,8 +401,8 @@ public class MainViewController implements Initializable {
             exportJsonButton.setDisable(true);
             generateProjectButton.setDisable(true);
         } else {
-            boolean hasLayerSelection = layersTreeView.getSelectionModel().getSelectedItem() != null 
-                    && layersTreeView.getSelectionModel().getSelectedItem().getValue() != null;
+            TreeItem<Node> selectedItem = layersTreeView.getSelectionModel().getSelectedItem();
+            boolean hasLayerSelection = selectedItem != null && selectedItem.getValue() != null;
             exportJsonButton.setDisable(!hasLayerSelection);
             generateProjectButton.setDisable(!hasLayerSelection);
         }
