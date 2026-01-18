@@ -159,4 +159,38 @@ class SettingsManagerTest {
         assertEquals("", settingsManager.getOAuthAccessToken());
         assertEquals("", settingsManager.getOAuthRefreshToken());
     }
+
+    @Test
+    @DisplayName("getOAuthRedirectUri should return default value")
+    void getOAuthRedirectUri_default_returnsDefault() {
+        assertEquals("http://localhost:8888/callback", settingsManager.getOAuthRedirectUri());
+    }
+
+    @Test
+    @DisplayName("setOAuthRedirectUri should store and retrieve redirect URI")
+    void setOAuthRedirectUri_validValue_storesValue() {
+        String redirectUri = "http://myapp.example.com/callback";
+        settingsManager.setOAuthRedirectUri(redirectUri);
+        assertEquals(redirectUri, settingsManager.getOAuthRedirectUri());
+    }
+
+    @Test
+    @DisplayName("setOAuthRedirectUri should use default for null")
+    void setOAuthRedirectUri_null_usesDefault() {
+        settingsManager.setOAuthRedirectUri(null);
+        assertEquals("http://localhost:8888/callback", settingsManager.getOAuthRedirectUri());
+    }
+
+    @Test
+    @DisplayName("setOAuthRedirectUri should use default for blank")
+    void setOAuthRedirectUri_blank_usesDefault() {
+        settingsManager.setOAuthRedirectUri("  ");
+        assertEquals("http://localhost:8888/callback", settingsManager.getOAuthRedirectUri());
+    }
+
+    @Test
+    @DisplayName("getDefaultOAuthRedirectUri should return static default")
+    void getDefaultOAuthRedirectUri_returnsStaticDefault() {
+        assertEquals("http://localhost:8888/callback", SettingsManager.getDefaultOAuthRedirectUri());
+    }
 }

@@ -3,6 +3,7 @@ package com.tlcsdm.figma2json.ui;
 import com.tlcsdm.figma2json.api.Document;
 import com.tlcsdm.figma2json.api.FigmaApiClient;
 import com.tlcsdm.figma2json.api.FigmaFile;
+import com.tlcsdm.figma2json.api.FigmaOAuthService;
 import com.tlcsdm.figma2json.api.Node;
 import com.tlcsdm.figma2json.converter.ConverterFactory;
 import com.tlcsdm.figma2json.converter.FigmaConverter;
@@ -17,6 +18,8 @@ import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.Notifications;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,6 +34,8 @@ import java.util.concurrent.CompletableFuture;
  * Main view controller for the Figma to JSON application.
  */
 public class MainViewController implements Initializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainViewController.class);
 
     @FXML
     private TextField figmaUrlField;
@@ -73,9 +78,14 @@ public class MainViewController implements Initializable {
 
     private final SettingsManager settingsManager = new SettingsManager();
     private final FigmaApiClient figmaClient = new FigmaApiClient();
+    private final FigmaOAuthService oauthService;
     private FigmaFile currentFile;
     private ResourceBundle bundle;
     private PreferencesHelper preferencesHelper;
+
+    public MainViewController() {
+        this.oauthService = new FigmaOAuthService(settingsManager);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -193,12 +203,39 @@ public class MainViewController implements Initializable {
         SettingsManager.AuthMode authMode;
         
         if (preferencesHelper != null) {
-            token = preferencesHelper.getEffectiveAccessToken();
             authMode = preferencesHelper.getAuthMode();
         } else {
             authMode = settingsManager.getAuthMode();
-            if (authMode == SettingsManager.AuthMode.OAUTH) {
-                token = settingsManager.getOAuthAccessToken();
+        }
+        
+        // For OAuth mode, try to get a valid token (with automatic refresh if needed)
+        if (authMode == SettingsManager.AuthMode.OAUTH) {
+            try {
+                // Check if OAuth is properly configured
+                if (!oauthService.isOAuthConfigured()) {
+                    showError(bundle.getString("error.oauthNotConfigured"));
+                    return;
+                }
+                
+                // Check if user is authorized
+                if (!oauthService.isAuthorized()) {
+                    showError(bundle.getString("error.noToken"));
+                    return;
+                }
+                
+                // Get valid access token (will refresh if needed)
+                log(bundle.getString("log.oauthRefreshing"));
+                token = oauthService.getValidAccessToken();
+                log(bundle.getString("log.oauthRefreshed"));
+            } catch (Exception e) {
+                logger.error("Failed to get valid OAuth token", e);
+                showError(bundle.getString("error.oauthTokenRefreshFailed") + ": " + e.getMessage());
+                return;
+            }
+        } else {
+            // Personal Access Token mode
+            if (preferencesHelper != null) {
+                token = preferencesHelper.getAccessToken();
             } else {
                 token = settingsManager.getAccessToken();
             }

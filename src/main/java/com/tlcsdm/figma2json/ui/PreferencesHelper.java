@@ -37,8 +37,7 @@ public class PreferencesHelper {
     private final ObservableList<String> authModeOptions;
     private final StringProperty oauthClientId;
     private final StringProperty oauthClientSecret;
-    private final StringProperty oauthAccessToken;
-    private final StringProperty oauthRefreshToken;
+    private final StringProperty oauthRedirectUri;
 
     private PreferencesFx preferencesFx;
 
@@ -57,8 +56,7 @@ public class PreferencesHelper {
         this.authMode = new SimpleObjectProperty<>(getAuthModeDisplayName(settingsManager.getAuthMode()));
         this.oauthClientId = new SimpleStringProperty(settingsManager.getOAuthClientId());
         this.oauthClientSecret = new SimpleStringProperty(settingsManager.getOAuthClientSecret());
-        this.oauthAccessToken = new SimpleStringProperty(settingsManager.getOAuthAccessToken());
-        this.oauthRefreshToken = new SimpleStringProperty(settingsManager.getOAuthRefreshToken());
+        this.oauthRedirectUri = new SimpleStringProperty(settingsManager.getOAuthRedirectUri());
 
         // Add listeners to save changes
         setupPropertyListeners();
@@ -103,15 +101,9 @@ public class PreferencesHelper {
             }
         });
 
-        oauthAccessToken.addListener((obs, oldVal, newVal) -> {
+        oauthRedirectUri.addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                settingsManager.setOAuthAccessToken(newVal);
-            }
-        });
-
-        oauthRefreshToken.addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                settingsManager.setOAuthRefreshToken(newVal);
+                settingsManager.setOAuthRedirectUri(newVal);
             }
         });
     }
@@ -138,8 +130,7 @@ public class PreferencesHelper {
                         Group.of(bundle.getString("preferences.group.oauth"),
                                 Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
                                 Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
-                                Setting.of(bundle.getString("preferences.oauthAccessToken"), oauthAccessToken),
-                                Setting.of(bundle.getString("preferences.oauthRefreshToken"), oauthRefreshToken)
+                                Setting.of(bundle.getString("preferences.oauthRedirectUri"), oauthRedirectUri)
                         ),
                         Group.of(bundle.getString("preferences.group.api"),
                                 Setting.of(bundle.getString("preferences.figmaApiUrl"), figmaApiUrl)
@@ -311,39 +302,39 @@ public class PreferencesHelper {
     }
 
     /**
-     * Gets the OAuth access token.
+     * Gets the OAuth redirect URI.
+     *
+     * @return the OAuth redirect URI
+     */
+    public String getOAuthRedirectUri() {
+        return oauthRedirectUri.get();
+    }
+
+    /**
+     * Gets the OAuth redirect URI property.
+     *
+     * @return the OAuth redirect URI property
+     */
+    public StringProperty oauthRedirectUriProperty() {
+        return oauthRedirectUri;
+    }
+
+    /**
+     * Gets the OAuth access token from settings.
      *
      * @return the OAuth access token
      */
     public String getOAuthAccessToken() {
-        return oauthAccessToken.get();
+        return settingsManager.getOAuthAccessToken();
     }
 
     /**
-     * Gets the OAuth access token property.
-     *
-     * @return the OAuth access token property
-     */
-    public StringProperty oauthAccessTokenProperty() {
-        return oauthAccessToken;
-    }
-
-    /**
-     * Gets the OAuth refresh token.
+     * Gets the OAuth refresh token from settings.
      *
      * @return the OAuth refresh token
      */
     public String getOAuthRefreshToken() {
-        return oauthRefreshToken.get();
-    }
-
-    /**
-     * Gets the OAuth refresh token property.
-     *
-     * @return the OAuth refresh token property
-     */
-    public StringProperty oauthRefreshTokenProperty() {
-        return oauthRefreshToken;
+        return settingsManager.getOAuthRefreshToken();
     }
 
     /**
@@ -359,5 +350,14 @@ public class PreferencesHelper {
         } else {
             return getAccessToken();
         }
+    }
+
+    /**
+     * Gets the settings manager.
+     *
+     * @return the settings manager
+     */
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
     }
 }

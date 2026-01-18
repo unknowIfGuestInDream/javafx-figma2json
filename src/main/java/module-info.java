@@ -6,6 +6,7 @@ module com.tlcsdm.figma2json {
     requires org.controlsfx.controls;
     requires java.net.http;
     requires org.slf4j;
+    requires java.desktop;
 
     opens com.tlcsdm.figma2json to javafx.fxml;
     opens com.tlcsdm.figma2json.ui to javafx.fxml;
