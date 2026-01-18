@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -164,12 +165,12 @@ public class FigmaFileCache {
         
         try {
             if (Files.exists(cacheDirectory)) {
-                long fileCount = Files.list(cacheDirectory)
+                List<Path> cacheFiles = Files.list(cacheDirectory)
                         .filter(path -> path.toString().endsWith(CACHE_FILE_EXTENSION))
-                        .count();
+                        .toList();
                 
-                long totalSize = Files.list(cacheDirectory)
-                        .filter(path -> path.toString().endsWith(CACHE_FILE_EXTENSION))
+                long fileCount = cacheFiles.size();
+                long totalSize = cacheFiles.stream()
                         .mapToLong(path -> {
                             try {
                                 return Files.size(path);

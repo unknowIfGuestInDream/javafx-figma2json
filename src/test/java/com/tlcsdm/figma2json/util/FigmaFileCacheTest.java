@@ -183,8 +183,8 @@ class FigmaFileCacheTest {
         layer.setId("layer-1");
         layer.setName("Layer 1");
         layer.setType("FRAME");
-        page.setChildren(layers);
         layers.add(layer);
+        page.setChildren(layers);
         
         pages.add(page);
         document.setChildren(pages);
