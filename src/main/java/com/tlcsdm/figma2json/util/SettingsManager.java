@@ -190,14 +190,14 @@ public class SettingsManager {
     /**
      * Gets the authentication mode.
      *
-     * @return the authentication mode (default: OAUTH)
+     * @return the authentication mode (default: TOKEN)
      */
     public AuthMode getAuthMode() {
-        String mode = prefs.get(PREF_AUTH_MODE, AuthMode.OAUTH.name());
+        String mode = prefs.get(PREF_AUTH_MODE, AuthMode.TOKEN.name());
         try {
             return AuthMode.valueOf(mode);
         } catch (IllegalArgumentException e) {
-            return AuthMode.OAUTH;
+            return AuthMode.TOKEN;
         }
     }
 
@@ -207,7 +207,7 @@ public class SettingsManager {
      * @param mode the authentication mode
      */
     public void setAuthMode(AuthMode mode) {
-        prefs.put(PREF_AUTH_MODE, mode != null ? mode.name() : AuthMode.OAUTH.name());
+        prefs.put(PREF_AUTH_MODE, mode != null ? mode.name() : AuthMode.TOKEN.name());
     }
 
     /**

@@ -29,9 +29,9 @@ class SettingsManagerTest {
     }
 
     @Test
-    @DisplayName("default auth mode should be OAuth")
-    void getAuthMode_default_returnsOAuth() {
-        assertEquals(AuthMode.OAUTH, settingsManager.getAuthMode());
+    @DisplayName("default auth mode should be Token")
+    void getAuthMode_default_returnsToken() {
+        assertEquals(AuthMode.TOKEN, settingsManager.getAuthMode());
     }
 
     @Test
@@ -49,10 +49,10 @@ class SettingsManagerTest {
     }
 
     @Test
-    @DisplayName("setAuthMode should default to OAuth for null")
-    void setAuthMode_null_defaultsToOAuth() {
+    @DisplayName("setAuthMode should default to Token for null")
+    void setAuthMode_null_defaultsToToken() {
         settingsManager.setAuthMode(null);
-        assertEquals(AuthMode.OAUTH, settingsManager.getAuthMode());
+        assertEquals(AuthMode.TOKEN, settingsManager.getAuthMode());
     }
 
     @Test
@@ -143,7 +143,7 @@ class SettingsManagerTest {
     @DisplayName("clearAll should clear OAuth settings")
     void clearAll_clearsOAuthSettings() {
         // Set some values first
-        settingsManager.setAuthMode(AuthMode.TOKEN);
+        settingsManager.setAuthMode(AuthMode.OAUTH);
         settingsManager.setOAuthClientId("client-id");
         settingsManager.setOAuthClientSecret("client-secret");
         settingsManager.setOAuthAccessToken("access-token");
@@ -153,7 +153,7 @@ class SettingsManagerTest {
         settingsManager.clearAll();
 
         // Verify defaults are restored
-        assertEquals(AuthMode.OAUTH, settingsManager.getAuthMode());
+        assertEquals(AuthMode.TOKEN, settingsManager.getAuthMode());
         assertEquals("", settingsManager.getOAuthClientId());
         assertEquals("", settingsManager.getOAuthClientSecret());
         assertEquals("", settingsManager.getOAuthAccessToken());
