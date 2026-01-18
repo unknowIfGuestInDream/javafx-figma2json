@@ -2,6 +2,7 @@ package com.tlcsdm.figma2json.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tlcsdm.figma2json.util.SettingsManager.AuthMode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -88,6 +89,41 @@ class FigmaApiClientTest {
     @DisplayName("getGson should return non-null Gson instance")
     void getGson_returnsNonNullInstance() {
         assertNotNull(apiClient.getGson());
+    }
+
+    @Test
+    @DisplayName("setAuthMode should set OAuth mode")
+    void setAuthMode_oauth_setsOAuthMode() {
+        apiClient.setAuthMode(AuthMode.OAUTH);
+        assertEquals(AuthMode.OAUTH, apiClient.getAuthMode());
+    }
+
+    @Test
+    @DisplayName("setAuthMode should set Token mode")
+    void setAuthMode_token_setsTokenMode() {
+        apiClient.setAuthMode(AuthMode.TOKEN);
+        assertEquals(AuthMode.TOKEN, apiClient.getAuthMode());
+    }
+
+    @Test
+    @DisplayName("setAuthMode should default to OAuth for null input")
+    void setAuthMode_null_defaultsToOAuth() {
+        apiClient.setAuthMode(null);
+        assertEquals(AuthMode.OAUTH, apiClient.getAuthMode());
+    }
+
+    @Test
+    @DisplayName("default auth mode should be OAuth")
+    void defaultAuthMode_shouldBeOAuth() {
+        assertEquals(AuthMode.OAUTH, apiClient.getAuthMode());
+    }
+
+    @Test
+    @DisplayName("setAccessToken should set and getAccessToken should return the token")
+    void setAndGetAccessToken_shouldWork() {
+        String token = "test-token-123";
+        apiClient.setAccessToken(token);
+        assertEquals(token, apiClient.getAccessToken());
     }
 
     @Test

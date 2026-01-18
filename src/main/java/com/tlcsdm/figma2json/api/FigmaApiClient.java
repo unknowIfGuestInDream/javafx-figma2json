@@ -2,6 +2,7 @@ package com.tlcsdm.figma2json.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tlcsdm.figma2json.util.SettingsManager.AuthMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ public class FigmaApiClient {
     private final Gson gson;
     private String accessToken;
     private String baseUrl = DEFAULT_BASE_URL;
+    private AuthMode authMode = AuthMode.OAUTH;
 
     public FigmaApiClient() {
         this.httpClient = HttpClient.newBuilder()
@@ -42,6 +44,33 @@ public class FigmaApiClient {
      */
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
+    }
+
+    /**
+     * Gets the current access token.
+     *
+     * @return the access token
+     */
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    /**
+     * Sets the authentication mode.
+     *
+     * @param authMode the authentication mode (OAUTH or TOKEN)
+     */
+    public void setAuthMode(AuthMode authMode) {
+        this.authMode = authMode != null ? authMode : AuthMode.OAUTH;
+    }
+
+    /**
+     * Gets the current authentication mode.
+     *
+     * @return the authentication mode
+     */
+    public AuthMode getAuthMode() {
+        return authMode;
     }
 
     /**
@@ -153,13 +182,24 @@ public class FigmaApiClient {
     }
 
     private HttpRequest buildRequest(String url) {
-        return HttpRequest.newBuilder()
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("X-FIGMA-TOKEN", accessToken)
                 .header("Accept", "application/json")
                 .timeout(Duration.ofSeconds(30))
-                .GET()
-                .build();
+                .GET();
+
+        // Use different authentication headers based on auth mode
+        if (authMode == AuthMode.OAUTH) {
+            // OAuth uses the Authorization: Bearer header
+            builder.header("Authorization", "Bearer " + accessToken);
+            logger.debug("Using OAuth authentication mode");
+        } else {
+            // Personal Access Token uses X-FIGMA-TOKEN header
+            builder.header("X-FIGMA-TOKEN", accessToken);
+            logger.debug("Using Token authentication mode");
+        }
+
+        return builder.build();
     }
 
     public Gson getGson() {

@@ -5,6 +5,7 @@ import com.dlsc.preferencesfx.model.Category;
 import com.dlsc.preferencesfx.model.Group;
 import com.dlsc.preferencesfx.model.Setting;
 import com.tlcsdm.figma2json.util.SettingsManager;
+import com.tlcsdm.figma2json.util.SettingsManager.AuthMode;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,6 +20,10 @@ import java.util.ResourceBundle;
  */
 public class PreferencesHelper {
 
+    // Constants for authentication mode display names
+    private static final String AUTH_MODE_OAUTH = "OAuth";
+    private static final String AUTH_MODE_TOKEN = "Token";
+
     private final SettingsManager settingsManager;
     private final ResourceBundle bundle;
 
@@ -26,6 +31,14 @@ public class PreferencesHelper {
     private final ObjectProperty<String> language;
     private final StringProperty figmaApiUrl;
     private final ObservableList<String> languageOptions;
+
+    // OAuth settings
+    private final ObjectProperty<String> authMode;
+    private final ObservableList<String> authModeOptions;
+    private final StringProperty oauthClientId;
+    private final StringProperty oauthClientSecret;
+    private final StringProperty oauthAccessToken;
+    private final StringProperty oauthRefreshToken;
 
     private PreferencesFx preferencesFx;
 
@@ -38,6 +51,14 @@ public class PreferencesHelper {
         this.languageOptions = FXCollections.observableArrayList("English", "中文", "日本語");
         this.language = new SimpleObjectProperty<>(getLanguageDisplayName(settingsManager.getLanguage()));
         this.figmaApiUrl = new SimpleStringProperty(settingsManager.getFigmaApiUrl());
+
+        // Initialize OAuth properties
+        this.authModeOptions = FXCollections.observableArrayList(AUTH_MODE_OAUTH, AUTH_MODE_TOKEN);
+        this.authMode = new SimpleObjectProperty<>(getAuthModeDisplayName(settingsManager.getAuthMode()));
+        this.oauthClientId = new SimpleStringProperty(settingsManager.getOAuthClientId());
+        this.oauthClientSecret = new SimpleStringProperty(settingsManager.getOAuthClientSecret());
+        this.oauthAccessToken = new SimpleStringProperty(settingsManager.getOAuthAccessToken());
+        this.oauthRefreshToken = new SimpleStringProperty(settingsManager.getOAuthRefreshToken());
 
         // Add listeners to save changes
         setupPropertyListeners();
@@ -62,6 +83,37 @@ public class PreferencesHelper {
                 settingsManager.setFigmaApiUrl(newVal);
             }
         });
+
+        // OAuth listeners
+        authMode.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setAuthMode(getAuthModeFromDisplayName(newVal));
+            }
+        });
+
+        oauthClientId.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setOAuthClientId(newVal);
+            }
+        });
+
+        oauthClientSecret.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setOAuthClientSecret(newVal);
+            }
+        });
+
+        oauthAccessToken.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setOAuthAccessToken(newVal);
+            }
+        });
+
+        oauthRefreshToken.addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                settingsManager.setOAuthRefreshToken(newVal);
+            }
+        });
     }
 
     /**
@@ -80,7 +132,14 @@ public class PreferencesHelper {
         return PreferencesFx.of(PreferencesHelper.class,
                 Category.of(bundle.getString("preferences.category.settings"),
                         Group.of(bundle.getString("preferences.group.authentication"),
+                                Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
                                 Setting.of(bundle.getString("preferences.accessToken"), accessToken)
+                        ),
+                        Group.of(bundle.getString("preferences.group.oauth"),
+                                Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
+                                Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
+                                Setting.of(bundle.getString("preferences.oauthAccessToken"), oauthAccessToken),
+                                Setting.of(bundle.getString("preferences.oauthRefreshToken"), oauthRefreshToken)
                         ),
                         Group.of(bundle.getString("preferences.group.api"),
                                 Setting.of(bundle.getString("preferences.figmaApiUrl"), figmaApiUrl)
@@ -115,6 +174,20 @@ public class PreferencesHelper {
             case "中文" -> "zh";
             case "日本語" -> "ja";
             default -> "en";
+        };
+    }
+
+    private String getAuthModeDisplayName(AuthMode mode) {
+        return switch (mode) {
+            case TOKEN -> AUTH_MODE_TOKEN;
+            default -> AUTH_MODE_OAUTH;
+        };
+    }
+
+    private AuthMode getAuthModeFromDisplayName(String displayName) {
+        return switch (displayName) {
+            case AUTH_MODE_TOKEN -> AuthMode.TOKEN;
+            default -> AuthMode.OAUTH;
         };
     }
 
@@ -181,5 +254,110 @@ public class PreferencesHelper {
     public boolean hasLanguageChanged(String initialLanguage) {
         String currentLangCode = getLanguageCode(language.get());
         return !currentLangCode.equals(initialLanguage);
+    }
+
+    /**
+     * Gets the current authentication mode.
+     *
+     * @return the authentication mode
+     */
+    public AuthMode getAuthMode() {
+        return getAuthModeFromDisplayName(authMode.get());
+    }
+
+    /**
+     * Gets the authentication mode property.
+     *
+     * @return the authentication mode property
+     */
+    public ObjectProperty<String> authModeProperty() {
+        return authMode;
+    }
+
+    /**
+     * Gets the OAuth client ID.
+     *
+     * @return the OAuth client ID
+     */
+    public String getOAuthClientId() {
+        return oauthClientId.get();
+    }
+
+    /**
+     * Gets the OAuth client ID property.
+     *
+     * @return the OAuth client ID property
+     */
+    public StringProperty oauthClientIdProperty() {
+        return oauthClientId;
+    }
+
+    /**
+     * Gets the OAuth client secret.
+     *
+     * @return the OAuth client secret
+     */
+    public String getOAuthClientSecret() {
+        return oauthClientSecret.get();
+    }
+
+    /**
+     * Gets the OAuth client secret property.
+     *
+     * @return the OAuth client secret property
+     */
+    public StringProperty oauthClientSecretProperty() {
+        return oauthClientSecret;
+    }
+
+    /**
+     * Gets the OAuth access token.
+     *
+     * @return the OAuth access token
+     */
+    public String getOAuthAccessToken() {
+        return oauthAccessToken.get();
+    }
+
+    /**
+     * Gets the OAuth access token property.
+     *
+     * @return the OAuth access token property
+     */
+    public StringProperty oauthAccessTokenProperty() {
+        return oauthAccessToken;
+    }
+
+    /**
+     * Gets the OAuth refresh token.
+     *
+     * @return the OAuth refresh token
+     */
+    public String getOAuthRefreshToken() {
+        return oauthRefreshToken.get();
+    }
+
+    /**
+     * Gets the OAuth refresh token property.
+     *
+     * @return the OAuth refresh token property
+     */
+    public StringProperty oauthRefreshTokenProperty() {
+        return oauthRefreshToken;
+    }
+
+    /**
+     * Gets the effective access token based on the authentication mode.
+     * If OAuth mode is selected, returns the OAuth access token.
+     * If Token mode is selected, returns the personal access token.
+     *
+     * @return the effective access token for API calls
+     */
+    public String getEffectiveAccessToken() {
+        if (getAuthMode() == AuthMode.OAUTH) {
+            return getOAuthAccessToken();
+        } else {
+            return getAccessToken();
+        }
     }
 }
