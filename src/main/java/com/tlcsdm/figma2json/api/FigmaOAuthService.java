@@ -36,7 +36,6 @@ public class FigmaOAuthService {
     
     private static final String OAUTH_AUTHORIZE_URL = "https://www.figma.com/oauth";
     private static final String OAUTH_TOKEN_URL = "https://www.figma.com/api/oauth/token";
-    private static final String DEFAULT_REDIRECT_URI = "http://localhost:8888/callback";
     private static final String DEFAULT_SCOPE = "file_read";
     
     private final HttpClient httpClient;
@@ -69,7 +68,7 @@ public class FigmaOAuthService {
         
         String effectiveRedirectUri = (redirectUri != null && !redirectUri.isBlank()) 
                 ? redirectUri 
-                : DEFAULT_REDIRECT_URI;
+                : SettingsManager.getDefaultOAuthRedirectUri();
         
         return OAUTH_AUTHORIZE_URL +
                 "?client_id=" + urlEncode(clientId) +
@@ -103,7 +102,7 @@ public class FigmaOAuthService {
         
         String effectiveRedirectUri = (redirectUri != null && !redirectUri.isBlank()) 
                 ? redirectUri 
-                : DEFAULT_REDIRECT_URI;
+                : SettingsManager.getDefaultOAuthRedirectUri();
         
         String formData = "client_id=" + urlEncode(clientId) +
                 "&client_secret=" + urlEncode(clientSecret) +
@@ -308,7 +307,7 @@ public class FigmaOAuthService {
      * @return the default redirect URI
      */
     public static String getDefaultRedirectUri() {
-        return DEFAULT_REDIRECT_URI;
+        return SettingsManager.getDefaultOAuthRedirectUri();
     }
 
     private void storeTokens(OAuthTokenResponse tokenResponse) {

@@ -224,9 +224,8 @@ public class MainViewController implements Initializable {
                 }
                 
                 // Get valid access token (will refresh if needed)
-                log(bundle.getString("log.oauthRefreshing"));
+                // Note: FigmaOAuthService logs when refresh actually occurs
                 token = oauthService.getValidAccessToken();
-                log(bundle.getString("log.oauthRefreshed"));
             } catch (Exception e) {
                 logger.error("Failed to get valid OAuth token", e);
                 showError(bundle.getString("error.oauthTokenRefreshFailed") + ": " + e.getMessage());

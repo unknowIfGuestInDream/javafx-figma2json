@@ -145,7 +145,7 @@ public class Figma2JsonApp extends Application {
                 logger.info("Opened browser for OAuth authorization");
                 
                 // Show dialog to input authorization code
-                showAuthorizationCodeDialog(state);
+                showAuthorizationCodeDialog();
             } else {
                 // Fallback: show the URL for manual copy
                 showAuthUrlDialog(authUrl);
@@ -156,7 +156,7 @@ public class Figma2JsonApp extends Application {
         }
     }
     
-    private void showAuthorizationCodeDialog(String state) {
+    private void showAuthorizationCodeDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle(bundle.getString("dialog.oauthCallback.title"));
         dialog.setHeaderText(bundle.getString("dialog.oauthCallback.header"));
@@ -193,7 +193,7 @@ public class Figma2JsonApp extends Application {
         alert.showAndWait();
         
         // After URL dialog, show the authorization code input
-        showAuthorizationCodeDialog("");
+        showAuthorizationCodeDialog();
     }
     
     private void exchangeAuthorizationCode(String authCode) {
