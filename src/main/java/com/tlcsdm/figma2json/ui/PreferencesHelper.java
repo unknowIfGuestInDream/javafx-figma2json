@@ -37,8 +37,10 @@ public class PreferencesHelper {
     private final ObservableList<String> authModeOptions;
     private final StringProperty oauthClientId;
     private final StringProperty oauthClientSecret;
-    private final StringProperty oauthAccessToken;
-    private final StringProperty oauthRefreshToken;
+    private final StringProperty oauthRedirectUri;
+    
+    // Cached auth mode for detecting changes
+    private AuthMode lastAuthMode;
 
     private PreferencesFx preferencesFx;
 
@@ -52,13 +54,15 @@ public class PreferencesHelper {
         this.language = new SimpleObjectProperty<>(getLanguageDisplayName(settingsManager.getLanguage()));
         this.figmaApiUrl = new SimpleStringProperty(settingsManager.getFigmaApiUrl());
 
-        // Initialize OAuth properties
-        this.authModeOptions = FXCollections.observableArrayList(AUTH_MODE_OAUTH, AUTH_MODE_TOKEN);
+        // Initialize OAuth properties - Token first in the list as it's the default
+        this.authModeOptions = FXCollections.observableArrayList(AUTH_MODE_TOKEN, AUTH_MODE_OAUTH);
         this.authMode = new SimpleObjectProperty<>(getAuthModeDisplayName(settingsManager.getAuthMode()));
         this.oauthClientId = new SimpleStringProperty(settingsManager.getOAuthClientId());
         this.oauthClientSecret = new SimpleStringProperty(settingsManager.getOAuthClientSecret());
-        this.oauthAccessToken = new SimpleStringProperty(settingsManager.getOAuthAccessToken());
-        this.oauthRefreshToken = new SimpleStringProperty(settingsManager.getOAuthRefreshToken());
+        this.oauthRedirectUri = new SimpleStringProperty(settingsManager.getOAuthRedirectUri());
+        
+        // Track the current auth mode
+        this.lastAuthMode = settingsManager.getAuthMode();
 
         // Add listeners to save changes
         setupPropertyListeners();
@@ -87,7 +91,13 @@ public class PreferencesHelper {
         // OAuth listeners
         authMode.addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                settingsManager.setAuthMode(getAuthModeFromDisplayName(newVal));
+                AuthMode mode = getAuthModeFromDisplayName(newVal);
+                settingsManager.setAuthMode(mode);
+                // Force rebuild of preferences when mode changes
+                if (mode != lastAuthMode) {
+                    lastAuthMode = mode;
+                    preferencesFx = null; // Force rebuild on next show
+                }
             }
         });
 
@@ -103,15 +113,9 @@ public class PreferencesHelper {
             }
         });
 
-        oauthAccessToken.addListener((obs, oldVal, newVal) -> {
+        oauthRedirectUri.addListener((obs, oldVal, newVal) -> {
             if (newVal != null) {
-                settingsManager.setOAuthAccessToken(newVal);
-            }
-        });
-
-        oauthRefreshToken.addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                settingsManager.setOAuthRefreshToken(newVal);
+                settingsManager.setOAuthRedirectUri(newVal);
             }
         });
     }
@@ -129,18 +133,29 @@ public class PreferencesHelper {
     }
 
     private PreferencesFx createPreferencesFx() {
+        AuthMode currentMode = getAuthModeFromDisplayName(authMode.get());
+        
+        // Build settings groups based on current auth mode
+        Group authGroup;
+        if (currentMode == AuthMode.TOKEN) {
+            // Token mode: show auth mode selector and personal access token
+            authGroup = Group.of(bundle.getString("preferences.group.authentication"),
+                    Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
+                    Setting.of(bundle.getString("preferences.accessToken"), accessToken)
+            );
+        } else {
+            // OAuth mode: show auth mode selector and OAuth settings
+            authGroup = Group.of(bundle.getString("preferences.group.authentication"),
+                    Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
+                    Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
+                    Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
+                    Setting.of(bundle.getString("preferences.oauthRedirectUri"), oauthRedirectUri)
+            );
+        }
+        
         return PreferencesFx.of(PreferencesHelper.class,
                 Category.of(bundle.getString("preferences.category.settings"),
-                        Group.of(bundle.getString("preferences.group.authentication"),
-                                Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
-                                Setting.of(bundle.getString("preferences.accessToken"), accessToken)
-                        ),
-                        Group.of(bundle.getString("preferences.group.oauth"),
-                                Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
-                                Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
-                                Setting.of(bundle.getString("preferences.oauthAccessToken"), oauthAccessToken),
-                                Setting.of(bundle.getString("preferences.oauthRefreshToken"), oauthRefreshToken)
-                        ),
+                        authGroup,
                         Group.of(bundle.getString("preferences.group.api"),
                                 Setting.of(bundle.getString("preferences.figmaApiUrl"), figmaApiUrl)
                         )
@@ -158,7 +173,9 @@ public class PreferencesHelper {
      * Shows the preferences dialog.
      */
     public void showPreferencesDialog() {
-        getPreferencesFx().show();
+        // Always recreate preferences to reflect current auth mode
+        preferencesFx = createPreferencesFx();
+        preferencesFx.show();
     }
 
     private String getLanguageDisplayName(String langCode) {
@@ -311,39 +328,39 @@ public class PreferencesHelper {
     }
 
     /**
-     * Gets the OAuth access token.
+     * Gets the OAuth redirect URI.
+     *
+     * @return the OAuth redirect URI
+     */
+    public String getOAuthRedirectUri() {
+        return oauthRedirectUri.get();
+    }
+
+    /**
+     * Gets the OAuth redirect URI property.
+     *
+     * @return the OAuth redirect URI property
+     */
+    public StringProperty oauthRedirectUriProperty() {
+        return oauthRedirectUri;
+    }
+
+    /**
+     * Gets the OAuth access token from settings.
      *
      * @return the OAuth access token
      */
     public String getOAuthAccessToken() {
-        return oauthAccessToken.get();
+        return settingsManager.getOAuthAccessToken();
     }
 
     /**
-     * Gets the OAuth access token property.
-     *
-     * @return the OAuth access token property
-     */
-    public StringProperty oauthAccessTokenProperty() {
-        return oauthAccessToken;
-    }
-
-    /**
-     * Gets the OAuth refresh token.
+     * Gets the OAuth refresh token from settings.
      *
      * @return the OAuth refresh token
      */
     public String getOAuthRefreshToken() {
-        return oauthRefreshToken.get();
-    }
-
-    /**
-     * Gets the OAuth refresh token property.
-     *
-     * @return the OAuth refresh token property
-     */
-    public StringProperty oauthRefreshTokenProperty() {
-        return oauthRefreshToken;
+        return settingsManager.getOAuthRefreshToken();
     }
 
     /**
@@ -359,5 +376,14 @@ public class PreferencesHelper {
         } else {
             return getAccessToken();
         }
+    }
+
+    /**
+     * Gets the settings manager.
+     *
+     * @return the settings manager
+     */
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
     }
 }

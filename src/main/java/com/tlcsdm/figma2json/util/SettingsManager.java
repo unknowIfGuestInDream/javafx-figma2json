@@ -23,6 +23,8 @@ public class SettingsManager {
     private static final String PREF_OAUTH_CLIENT_SECRET = "oauthClientSecret";
     private static final String PREF_OAUTH_ACCESS_TOKEN = "oauthAccessToken";
     private static final String PREF_OAUTH_REFRESH_TOKEN = "oauthRefreshToken";
+    private static final String PREF_OAUTH_REDIRECT_URI = "oauthRedirectUri";
+    private static final String DEFAULT_OAUTH_REDIRECT_URI = "http://localhost:8888/callback";
 
     /**
      * Authentication mode: OAuth or Token.
@@ -188,14 +190,14 @@ public class SettingsManager {
     /**
      * Gets the authentication mode.
      *
-     * @return the authentication mode (default: OAUTH)
+     * @return the authentication mode (default: TOKEN)
      */
     public AuthMode getAuthMode() {
-        String mode = prefs.get(PREF_AUTH_MODE, AuthMode.OAUTH.name());
+        String mode = prefs.get(PREF_AUTH_MODE, AuthMode.TOKEN.name());
         try {
             return AuthMode.valueOf(mode);
         } catch (IllegalArgumentException e) {
-            return AuthMode.OAUTH;
+            return AuthMode.TOKEN;
         }
     }
 
@@ -205,7 +207,7 @@ public class SettingsManager {
      * @param mode the authentication mode
      */
     public void setAuthMode(AuthMode mode) {
-        prefs.put(PREF_AUTH_MODE, mode != null ? mode.name() : AuthMode.OAUTH.name());
+        prefs.put(PREF_AUTH_MODE, mode != null ? mode.name() : AuthMode.TOKEN.name());
     }
 
     /**
@@ -278,6 +280,34 @@ public class SettingsManager {
      */
     public void setOAuthRefreshToken(String refreshToken) {
         prefs.put(PREF_OAUTH_REFRESH_TOKEN, refreshToken != null ? refreshToken : "");
+    }
+
+    /**
+     * Gets the OAuth redirect URI.
+     *
+     * @return the OAuth redirect URI, or default if not set
+     */
+    public String getOAuthRedirectUri() {
+        return prefs.get(PREF_OAUTH_REDIRECT_URI, DEFAULT_OAUTH_REDIRECT_URI);
+    }
+
+    /**
+     * Sets the OAuth redirect URI.
+     *
+     * @param redirectUri the OAuth redirect URI
+     */
+    public void setOAuthRedirectUri(String redirectUri) {
+        prefs.put(PREF_OAUTH_REDIRECT_URI, redirectUri != null && !redirectUri.isBlank() 
+                ? redirectUri : DEFAULT_OAUTH_REDIRECT_URI);
+    }
+
+    /**
+     * Gets the default OAuth redirect URI.
+     *
+     * @return the default OAuth redirect URI
+     */
+    public static String getDefaultOAuthRedirectUri() {
+        return DEFAULT_OAUTH_REDIRECT_URI;
     }
 
     /**
