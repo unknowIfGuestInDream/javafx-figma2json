@@ -17,6 +17,20 @@ public class SettingsManager {
     private static final String PREF_FIGMA_API_URL = "figmaApiUrl";
     private static final String DEFAULT_FIGMA_API_URL = "https://api.figma.com/v1";
 
+    // OAuth settings
+    private static final String PREF_AUTH_MODE = "authMode";
+    private static final String PREF_OAUTH_CLIENT_ID = "oauthClientId";
+    private static final String PREF_OAUTH_CLIENT_SECRET = "oauthClientSecret";
+    private static final String PREF_OAUTH_ACCESS_TOKEN = "oauthAccessToken";
+    private static final String PREF_OAUTH_REFRESH_TOKEN = "oauthRefreshToken";
+
+    /**
+     * Authentication mode: OAuth or Token.
+     */
+    public enum AuthMode {
+        OAUTH, TOKEN
+    }
+
     private final Preferences prefs;
 
     public SettingsManager() {
@@ -169,6 +183,101 @@ public class SettingsManager {
      */
     public static String getDefaultFigmaApiUrl() {
         return DEFAULT_FIGMA_API_URL;
+    }
+
+    /**
+     * Gets the authentication mode.
+     *
+     * @return the authentication mode (default: OAUTH)
+     */
+    public AuthMode getAuthMode() {
+        String mode = prefs.get(PREF_AUTH_MODE, AuthMode.OAUTH.name());
+        try {
+            return AuthMode.valueOf(mode);
+        } catch (IllegalArgumentException e) {
+            return AuthMode.OAUTH;
+        }
+    }
+
+    /**
+     * Sets the authentication mode.
+     *
+     * @param mode the authentication mode
+     */
+    public void setAuthMode(AuthMode mode) {
+        prefs.put(PREF_AUTH_MODE, mode != null ? mode.name() : AuthMode.OAUTH.name());
+    }
+
+    /**
+     * Gets the OAuth client ID.
+     *
+     * @return the OAuth client ID, or empty string if not set
+     */
+    public String getOAuthClientId() {
+        return prefs.get(PREF_OAUTH_CLIENT_ID, "");
+    }
+
+    /**
+     * Sets the OAuth client ID.
+     *
+     * @param clientId the OAuth client ID
+     */
+    public void setOAuthClientId(String clientId) {
+        prefs.put(PREF_OAUTH_CLIENT_ID, clientId != null ? clientId : "");
+    }
+
+    /**
+     * Gets the OAuth client secret.
+     *
+     * @return the OAuth client secret, or empty string if not set
+     */
+    public String getOAuthClientSecret() {
+        return prefs.get(PREF_OAUTH_CLIENT_SECRET, "");
+    }
+
+    /**
+     * Sets the OAuth client secret.
+     *
+     * @param clientSecret the OAuth client secret
+     */
+    public void setOAuthClientSecret(String clientSecret) {
+        prefs.put(PREF_OAUTH_CLIENT_SECRET, clientSecret != null ? clientSecret : "");
+    }
+
+    /**
+     * Gets the OAuth access token.
+     *
+     * @return the OAuth access token, or empty string if not set
+     */
+    public String getOAuthAccessToken() {
+        return prefs.get(PREF_OAUTH_ACCESS_TOKEN, "");
+    }
+
+    /**
+     * Sets the OAuth access token.
+     *
+     * @param accessToken the OAuth access token
+     */
+    public void setOAuthAccessToken(String accessToken) {
+        prefs.put(PREF_OAUTH_ACCESS_TOKEN, accessToken != null ? accessToken : "");
+    }
+
+    /**
+     * Gets the OAuth refresh token.
+     *
+     * @return the OAuth refresh token, or empty string if not set
+     */
+    public String getOAuthRefreshToken() {
+        return prefs.get(PREF_OAUTH_REFRESH_TOKEN, "");
+    }
+
+    /**
+     * Sets the OAuth refresh token.
+     *
+     * @param refreshToken the OAuth refresh token
+     */
+    public void setOAuthRefreshToken(String refreshToken) {
+        prefs.put(PREF_OAUTH_REFRESH_TOKEN, refreshToken != null ? refreshToken : "");
     }
 
     /**

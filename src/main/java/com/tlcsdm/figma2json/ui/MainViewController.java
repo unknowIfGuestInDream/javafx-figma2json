@@ -188,8 +188,22 @@ public class MainViewController implements Initializable {
 
     @FXML
     private void loadFigmaFile() {
-        // Get access token from preferences
-        String token = preferencesHelper != null ? preferencesHelper.getAccessToken() : settingsManager.getAccessToken();
+        // Get access token and auth mode from preferences
+        String token;
+        SettingsManager.AuthMode authMode;
+        
+        if (preferencesHelper != null) {
+            token = preferencesHelper.getEffectiveAccessToken();
+            authMode = preferencesHelper.getAuthMode();
+        } else {
+            authMode = settingsManager.getAuthMode();
+            if (authMode == SettingsManager.AuthMode.OAUTH) {
+                token = settingsManager.getOAuthAccessToken();
+            } else {
+                token = settingsManager.getAccessToken();
+            }
+        }
+        
         String url = figmaUrlField.getText();
 
         if (token == null || token.isBlank()) {
@@ -206,8 +220,9 @@ public class MainViewController implements Initializable {
         setLoading(true);
         log(bundle.getString("log.loading") + ": " + fileKey);
 
-        // Configure the API client with token and API URL
+        // Configure the API client with token, auth mode and API URL
         figmaClient.setAccessToken(token);
+        figmaClient.setAuthMode(authMode);
         String apiUrl = preferencesHelper != null ? preferencesHelper.getFigmaApiUrl() : settingsManager.getFigmaApiUrl();
         figmaClient.setBaseUrl(apiUrl);
         
