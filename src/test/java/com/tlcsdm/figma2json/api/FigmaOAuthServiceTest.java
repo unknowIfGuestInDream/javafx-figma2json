@@ -43,7 +43,7 @@ class FigmaOAuthServiceTest {
         assertTrue(url.contains("redirect_uri="));
         assertTrue(url.contains("state=random-state"));
         assertTrue(url.contains("response_type=code"));
-        assertTrue(url.contains("scope=file_read"));
+        assertTrue(url.contains("scope=file_content%3Aread"));
     }
 
     @Test

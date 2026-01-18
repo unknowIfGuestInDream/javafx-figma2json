@@ -36,7 +36,7 @@ public class FigmaOAuthService {
     
     private static final String OAUTH_AUTHORIZE_URL = "https://www.figma.com/oauth";
     private static final String OAUTH_TOKEN_URL = "https://www.figma.com/api/oauth/token";
-    private static final String DEFAULT_SCOPE = "file_read";
+    private static final String DEFAULT_SCOPE = "file_content:read";
     
     private final HttpClient httpClient;
     private final Gson gson;

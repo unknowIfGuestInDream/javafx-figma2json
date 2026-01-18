@@ -93,7 +93,7 @@ public class PreferencesHelper {
             if (newVal != null) {
                 AuthMode mode = getAuthModeFromDisplayName(newVal);
                 settingsManager.setAuthMode(mode);
-                // Force rebuild of preferences when mode changes
+                // Mark preferences for rebuild on next show
                 if (mode != lastAuthMode) {
                     lastAuthMode = mode;
                     preferencesFx = null; // Force rebuild on next show
