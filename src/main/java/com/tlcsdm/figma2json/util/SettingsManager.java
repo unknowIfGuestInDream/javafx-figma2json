@@ -288,7 +288,13 @@ public class SettingsManager {
      * @return the OAuth redirect URI, or default if not set
      */
     public String getOAuthRedirectUri() {
-        return prefs.get(PREF_OAUTH_REDIRECT_URI, DEFAULT_OAUTH_REDIRECT_URI);
+        String value = prefs.get(PREF_OAUTH_REDIRECT_URI, "");
+        // If empty, return and save default
+        if (value == null || value.isBlank()) {
+            value = DEFAULT_OAUTH_REDIRECT_URI;
+            prefs.put(PREF_OAUTH_REDIRECT_URI, value);
+        }
+        return value;
     }
 
     /**

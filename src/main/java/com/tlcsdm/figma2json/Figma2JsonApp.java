@@ -39,6 +39,7 @@ public class Figma2JsonApp extends Application {
     private static PreferencesHelper preferencesHelper;
     private static String initialLanguage;
     private static FigmaOAuthService oauthService;
+    private static MainViewController mainController;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -58,6 +59,7 @@ public class Figma2JsonApp extends Application {
         // Get the controller and pass the preferences helper
         MainViewController controller = loader.getController();
         controller.setPreferencesHelper(preferencesHelper);
+        mainController = controller;
 
         // Create menu bar
         MenuBar menuBar = createMenuBar();
@@ -103,6 +105,9 @@ public class Figma2JsonApp extends Application {
         MenuItem revokeAuthItem = new MenuItem(bundle.getString("button.revokeAuth"));
         revokeAuthItem.setOnAction(e -> revokeOAuthAuthorization());
         
+        MenuItem clearCacheItem = new MenuItem(bundle.getString("menu.file.clearCache"));
+        clearCacheItem.setOnAction(e -> clearCache());
+        
         MenuItem restartItem = new MenuItem(bundle.getString("menu.file.restart"));
         restartItem.setOnAction(e -> restartApplication());
         
@@ -110,7 +115,8 @@ public class Figma2JsonApp extends Application {
         exitItem.setOnAction(e -> Platform.exit());
         
         fileMenu.getItems().addAll(preferencesItem, new SeparatorMenuItem(), 
-                authorizeItem, revokeAuthItem, new SeparatorMenuItem(), 
+                authorizeItem, revokeAuthItem, new SeparatorMenuItem(),
+                clearCacheItem, new SeparatorMenuItem(),
                 restartItem, exitItem);
 
         // Help menu
@@ -223,6 +229,12 @@ public class Figma2JsonApp extends Application {
         alert.setHeaderText(null);
         alert.setContentText(bundle.getString("log.oauthRevoked"));
         alert.showAndWait();
+    }
+    
+    private void clearCache() {
+        if (mainController != null) {
+            mainController.clearAllCache();
+        }
     }
 
     private void showPreferences() {

@@ -9,6 +9,7 @@ import com.tlcsdm.figma2json.converter.ConverterFactory;
 import com.tlcsdm.figma2json.converter.FigmaConverter;
 import com.tlcsdm.figma2json.generator.GeneratorFactory;
 import com.tlcsdm.figma2json.generator.ProjectGenerator;
+import com.tlcsdm.figma2json.util.FigmaFileCache;
 import com.tlcsdm.figma2json.util.SettingsManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -42,6 +43,9 @@ public class MainViewController implements Initializable {
 
     @FXML
     private Button loadButton;
+
+    @FXML
+    private Button refreshButton;
 
     @FXML
     private TreeView<Node> pagesTreeView;
@@ -79,9 +83,11 @@ public class MainViewController implements Initializable {
     private final SettingsManager settingsManager = new SettingsManager();
     private final FigmaApiClient figmaClient = new FigmaApiClient();
     private final FigmaOAuthService oauthService;
+    private final FigmaFileCache figmaFileCache = new FigmaFileCache();
     private FigmaFile currentFile;
     private ResourceBundle bundle;
     private PreferencesHelper preferencesHelper;
+    private String currentFileKey;
 
     public MainViewController() {
         this.oauthService = new FigmaOAuthService(settingsManager);
@@ -117,6 +123,16 @@ public class MainViewController implements Initializable {
      */
     public void setPreferencesHelper(PreferencesHelper preferencesHelper) {
         this.preferencesHelper = preferencesHelper;
+    }
+
+    /**
+     * Clears all cached Figma files.
+     * This is called from the menu bar.
+     */
+    public void clearAllCache() {
+        figmaFileCache.clearAllCache();
+        log("All cache cleared");
+        showSuccess("Cache cleared successfully");
     }
 
     private void loadSettings() {
@@ -175,6 +191,7 @@ public class MainViewController implements Initializable {
 
     private void setupButtonActions() {
         loadButton.setOnAction(e -> loadFigmaFile());
+        refreshButton.setOnAction(e -> refreshFigmaFile());
         browseButton.setOnAction(e -> browseOutputDirectory());
         exportJsonButton.setOnAction(e -> exportToJson());
         generateProjectButton.setOnAction(e -> generateProject());
@@ -253,6 +270,20 @@ public class MainViewController implements Initializable {
             return;
         }
 
+        // Store current file key
+        currentFileKey = fileKey;
+        
+        // Try to load from cache first
+        FigmaFile cachedFile = figmaFileCache.loadCachedFile(fileKey);
+        if (cachedFile != null) {
+            logger.info("Using cached file for key: {}", fileKey);
+            currentFile = cachedFile;
+            populatePagesTree(cachedFile);
+            log(bundle.getString("log.loaded") + " (cached): " + cachedFile.getName());
+            statusLabel.setText(bundle.getString("status.loaded") + " (cached): " + cachedFile.getName());
+            return;
+        }
+
         setLoading(true);
         log(bundle.getString("log.loading") + ": " + fileKey);
 
@@ -266,6 +297,8 @@ public class MainViewController implements Initializable {
 
         future.thenAccept(file -> Platform.runLater(() -> {
             currentFile = file;
+            // Save to cache
+            figmaFileCache.saveCachedFile(fileKey, file);
             populatePagesTree(file);
             setLoading(false);
             log(bundle.getString("log.loaded") + ": " + file.getName());
@@ -278,6 +311,24 @@ public class MainViewController implements Initializable {
             });
             return null;
         });
+    }
+
+    @FXML
+    private void refreshFigmaFile() {
+        String url = figmaUrlField.getText();
+        String fileKey = FigmaApiClient.extractFileKey(url);
+        
+        if (fileKey == null) {
+            showError(bundle.getString("error.invalidUrl"));
+            return;
+        }
+        
+        // Clear cache for this file
+        figmaFileCache.clearCachedFile(fileKey);
+        log("Cache cleared for file: " + fileKey);
+        
+        // Reload the file from API
+        loadFigmaFile();
     }
 
     private void populatePagesTree(FigmaFile file) {
