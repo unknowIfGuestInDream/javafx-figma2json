@@ -20,6 +20,10 @@ import java.util.ResourceBundle;
  */
 public class PreferencesHelper {
 
+    // Constants for authentication mode display names
+    private static final String AUTH_MODE_OAUTH = "OAuth";
+    private static final String AUTH_MODE_TOKEN = "Token";
+
     private final SettingsManager settingsManager;
     private final ResourceBundle bundle;
 
@@ -49,7 +53,7 @@ public class PreferencesHelper {
         this.figmaApiUrl = new SimpleStringProperty(settingsManager.getFigmaApiUrl());
 
         // Initialize OAuth properties
-        this.authModeOptions = FXCollections.observableArrayList("OAuth", "Token");
+        this.authModeOptions = FXCollections.observableArrayList(AUTH_MODE_OAUTH, AUTH_MODE_TOKEN);
         this.authMode = new SimpleObjectProperty<>(getAuthModeDisplayName(settingsManager.getAuthMode()));
         this.oauthClientId = new SimpleStringProperty(settingsManager.getOAuthClientId());
         this.oauthClientSecret = new SimpleStringProperty(settingsManager.getOAuthClientSecret());
@@ -175,14 +179,14 @@ public class PreferencesHelper {
 
     private String getAuthModeDisplayName(AuthMode mode) {
         return switch (mode) {
-            case TOKEN -> "Token";
-            default -> "OAuth";
+            case TOKEN -> AUTH_MODE_TOKEN;
+            default -> AUTH_MODE_OAUTH;
         };
     }
 
     private AuthMode getAuthModeFromDisplayName(String displayName) {
         return switch (displayName) {
-            case "Token" -> AuthMode.TOKEN;
+            case AUTH_MODE_TOKEN -> AuthMode.TOKEN;
             default -> AuthMode.OAUTH;
         };
     }
