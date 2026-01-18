@@ -45,9 +45,6 @@ public class MainViewController implements Initializable {
     private Button loadButton;
 
     @FXML
-    private Button refreshButton;
-
-    @FXML
     private TreeView<Node> pagesTreeView;
 
     @FXML
@@ -191,7 +188,6 @@ public class MainViewController implements Initializable {
 
     private void setupButtonActions() {
         loadButton.setOnAction(e -> loadFigmaFile());
-        refreshButton.setOnAction(e -> refreshFigmaFile());
         browseButton.setOnAction(e -> browseOutputDirectory());
         exportJsonButton.setOnAction(e -> exportToJson());
         generateProjectButton.setOnAction(e -> generateProject());
@@ -273,16 +269,8 @@ public class MainViewController implements Initializable {
         // Store current file key
         currentFileKey = fileKey;
         
-        // Try to load from cache first
-        FigmaFile cachedFile = figmaFileCache.loadCachedFile(fileKey);
-        if (cachedFile != null) {
-            logger.info("Using cached file for key: {}", fileKey);
-            currentFile = cachedFile;
-            populatePagesTree(cachedFile);
-            log(bundle.getString("log.loaded") + " (cached): " + cachedFile.getName());
-            statusLabel.setText(bundle.getString("status.loaded") + " (cached): " + cachedFile.getName());
-            return;
-        }
+        // Clear cache for this file before loading to always get fresh data
+        figmaFileCache.clearCachedFile(fileKey);
 
         setLoading(true);
         log(bundle.getString("log.loading") + ": " + fileKey);
@@ -311,24 +299,6 @@ public class MainViewController implements Initializable {
             });
             return null;
         });
-    }
-
-    @FXML
-    private void refreshFigmaFile() {
-        String url = figmaUrlField.getText();
-        String fileKey = FigmaApiClient.extractFileKey(url);
-        
-        if (fileKey == null) {
-            showError(bundle.getString("error.invalidUrl"));
-            return;
-        }
-        
-        // Clear cache for this file
-        figmaFileCache.clearCachedFile(fileKey);
-        log("Cache cleared for file: " + fileKey);
-        
-        // Reload the file from API
-        loadFigmaFile();
     }
 
     private void populatePagesTree(FigmaFile file) {
