@@ -47,7 +47,6 @@
                 <Label text="%figma.url"/>
                 <TextField fx:id="figmaUrlField" promptText="%figma.url.prompt" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="loadButton" text="%button.load"/>
-                <Button fx:id="refreshButton" text="%button.refresh"/>
                 <ProgressIndicator fx:id="progressIndicator" visible="false" prefWidth="25" prefHeight="25"/>
             </HBox>
         </VBox>

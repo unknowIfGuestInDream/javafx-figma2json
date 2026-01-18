@@ -38,9 +38,6 @@ public class PreferencesHelper {
     private final StringProperty oauthClientId;
     private final StringProperty oauthClientSecret;
     private final StringProperty oauthRedirectUri;
-    
-    // Cached auth mode for detecting changes
-    private AuthMode lastAuthMode;
 
     private PreferencesFx preferencesFx;
 
@@ -60,9 +57,6 @@ public class PreferencesHelper {
         this.oauthClientId = new SimpleStringProperty(settingsManager.getOAuthClientId());
         this.oauthClientSecret = new SimpleStringProperty(settingsManager.getOAuthClientSecret());
         this.oauthRedirectUri = new SimpleStringProperty(settingsManager.getOAuthRedirectUri());
-        
-        // Track the current auth mode
-        this.lastAuthMode = settingsManager.getAuthMode();
 
         // Add listeners to save changes
         setupPropertyListeners();
@@ -93,11 +87,6 @@ public class PreferencesHelper {
             if (newVal != null) {
                 AuthMode mode = getAuthModeFromDisplayName(newVal);
                 settingsManager.setAuthMode(mode);
-                // Mark preferences for rebuild on next show
-                if (mode != lastAuthMode) {
-                    lastAuthMode = mode;
-                    preferencesFx = null; // Force rebuild on next show
-                }
             }
         });
 
@@ -133,25 +122,15 @@ public class PreferencesHelper {
     }
 
     private PreferencesFx createPreferencesFx() {
-        AuthMode currentMode = getAuthModeFromDisplayName(authMode.get());
-        
-        // Build settings groups based on current auth mode
-        Group authGroup;
-        if (currentMode == AuthMode.TOKEN) {
-            // Token mode: show auth mode selector and personal access token
-            authGroup = Group.of(bundle.getString("preferences.group.authentication"),
-                    Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
-                    Setting.of(bundle.getString("preferences.accessToken"), accessToken)
-            );
-        } else {
-            // OAuth mode: show auth mode selector and OAuth settings
-            authGroup = Group.of(bundle.getString("preferences.group.authentication"),
-                    Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
-                    Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
-                    Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
-                    Setting.of(bundle.getString("preferences.oauthRedirectUri"), oauthRedirectUri)
-            );
-        }
+        // Show all authentication settings (both Token and OAuth) 
+        // to avoid refresh issues when switching auth mode
+        Group authGroup = Group.of(bundle.getString("preferences.group.authentication"),
+                Setting.of(bundle.getString("preferences.authMode"), authModeOptions, authMode),
+                Setting.of(bundle.getString("preferences.accessToken"), accessToken),
+                Setting.of(bundle.getString("preferences.oauthClientId"), oauthClientId),
+                Setting.of(bundle.getString("preferences.oauthClientSecret"), oauthClientSecret),
+                Setting.of(bundle.getString("preferences.oauthRedirectUri"), oauthRedirectUri)
+        );
         
         return PreferencesFx.of(PreferencesHelper.class,
                 Category.of(bundle.getString("preferences.category.settings"),
